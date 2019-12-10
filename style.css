@@ -1,10 +1,7 @@
-#overlay {
+.create {
     position: fixed;
     left: 40%;
     top: 5%;
-    /*удалить дальше */
-    height: 530px;
-    width: 380px;
 }
 
 #forms {

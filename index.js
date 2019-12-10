@@ -1,54 +1,99 @@
 ymaps.ready(init);
+
 function init(){
+   
+    const modal = document.querySelector('#overlay');
     let myPlacemark;
+    let geoObj = new Array; 
+    const create = document.querySelector('.create');
+    
     const myMap = new ymaps.Map('maps', {
         center: [55.7482921,37.5900027],
         zoom: 15 
     })
-   // yandexMaps.behaviors.disable('scrollZoom');
 
-    // Слушаем клик на карте.
     myMap.events.add('click', function (e) {
-        let coords = e.get('coords');
-        
-        myPlacemark = createPlacemark(coords);
-        myMap.geoObjects.add(myPlacemark);
-        getAddress(myPlacemark.geometry.getCoordinates());
-        getAddress(coords);
-    });
+        let coords = e.get('coords'); 
+        ymaps.geocode(coords)
+            .then(function (res) {
+                let firstGeoObject = res.geoObjects.get(0);    
+                return firstGeoObject.getAddressLine();;
+            })
+            .then((adres)=>{
+                reviewModal(adres, coords);
+                console.log(adres)
+                console.log(coords)
+            })
 
+
+        myPlacemark = createPlacemark(coords); //Создаем метку 
+
+        myMap.geoObjects.add(myPlacemark); 
+        myPlacemark.events.add('click', function (e) {
+            console.log(e.originalEvent.target.properties._data.balloonContent)
+            console.log('asdasd')
+        })
+
+    });
+    
     // Создание метки.
     function createPlacemark(coords) {
-        return new ymaps.Placemark(coords, {
-            iconCaption: 'поиск...'
-        }, {
-            preset: 'islands#violetDotIconWithCaption',
+        return new ymaps.Placemark(coords,{
+           
+            balloonContent: 'цвет <strong>влюбленной жабы</strong>',
+        },{
+            preset: 'islands#violetIcon',
         });
     }
-
+    
     // Определяем адрес по координатам (обратное геокодирование).
-    function getAddress(coords) {
-        myPlacemark.properties.set('iconCaption', 'поиск...');
-        ymaps.geocode(coords).then(function (res) {
-            var firstGeoObject = res.geoObjects.get(0);
+    
+    function reviewModal(adress, coords, textRevi) {
+        const html = modal.innerHTML;
+        const template = Handlebars.compile(html);
+        const thisObj = {
+            position: adress
+        };
+        const psd = template(thisObj);
+        create.innerHTML = psd;
+        let arrRev = new Array;
 
-            myPlacemark.properties
-                .set({
-                    // Формируем строку с данными об объекте.
-                    iconCaption: [
-                        // Название населенного пункта или вышестоящее административно-территориальное образование.
-                        firstGeoObject.getLocalities().length ? firstGeoObject.getLocalities() : firstGeoObject.getAdministrativeAreas(),
-                        // Получаем путь до топонима, если метод вернул null, запрашиваем наименование здания.
-                        firstGeoObject.getThoroughfare() || firstGeoObject.getPremise()
-                    ].filter(Boolean).join(', '),
-                    // В качестве контента балуна задаем строку с адресом объекта.
-                    balloonContent: firstGeoObject.getAddressLine()
-                   
-                });
-                console.log(firstGeoObject.getAddressLine())
-        });
+
+        create.addEventListener('click', (e)=>{
+            
+            if(e.target.className == 'close-reviews') {
+                create.innerHTML = '';
+            } else if (e.target.className == 'i-btn') {
+                arrRev.push(
+                    {
+                        name: document.querySelector('.i-name').value,
+                        place: document.querySelector('.i-place').value,
+                        area: document.querySelector('.i-area').value
+                    }
+                )
+                console.log(arrRev)  //тут массив отзывов
+            }
+        })  
         
     }
+    let clusterer = new ymaps.Clusterer({
 
+    });
+    /*clusterer.createCluster = function(center, geoObjects)
+        {
+            var cluster = ymaps.Clusterer.prototype.createCluster.call(this, center, geoObjects) ;
+            cluster.events.add('click', function(e) {
+                e.stopImmediatePropagation();
+                console.log('Кликнут кластер') ;    
+                
+            }) ;
+            return cluster;
+        };*/
+    myMap.geoObjects.add(clusterer);
+    myMap.geoObjects.events.add('click', (e)=>{
+
+        console.log(e)
+    });
+
+   
 }
-

@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="style.css">
     <script src="https://api-maps.yandex.ru/2.1/?apikey=c89c1fe4-e63f-48e8-9a11-c7a9a99608f5&lang=ru_RU" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
     <title>Reviews Map</title>
 </head>
 <body>
@@ -22,13 +23,18 @@
     <div class="container">
         <div class="maps" id="maps"></div>
     </div>
-    <div type="template" id="overlay">
+    <div class="create"></div>
+    <script type="text/x-handlebars-template" id="overlay">
         <div class="review-container">
             <div class="review-container__header">
-                <span class="review-container__adress"></span>
+                <span class="review-container__adress">{{ position }}</span>
                 <button type="button" class="close-reviews"></button>
             </div>
-            <ul class="reviews"></ul>
+            <ul class="reviews">
+                <li class="reviews-item">
+                    
+                </li>
+            </ul>
             <form action="" id="forms">
                 <h3 class="headline">ваш отзыв</h3>
                 <input type="text" placeholder="Ваше имя" name="autor-name" class="i-name style-input">
@@ -39,7 +45,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </script>
     <script src="index.js"></script>
 </body>
 </html>

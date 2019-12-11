@@ -46,6 +46,15 @@
             </form>
         </div>
     </script>
+    <script type="text/x-handlebars-template" id="otziv">
+        {{#each this}}
+        <li class="reviews-item">
+            <strong>{{ name }}</strong>
+            <i>{{ place }}</i>
+            <span>{{ area }}</span>
+        </li>
+        {{/each}}
+    </script>
     <script src="index.js"></script>
 </body>
 </html>

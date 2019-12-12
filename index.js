@@ -5,16 +5,21 @@ function init(){
     const modal = document.querySelector('#overlay');
     const otziv = document.querySelector('#otziv');
     const create = document.querySelector('.create');
+    
     let storage = localStorage;
     let data;
     let thisAdress;
     let thisCoords;
     let placeObject = new Array;
     const customItemContentLayout = ymaps.templateLayoutFactory.createClass(
-        '<div class="ballon_place ballon_our"><strong>{{ properties.reviews.place|raw }}</strong></div>' +
-        '<a href="#" id="links" class="ballon_adres ballon_our">{{ properties.adressReview|raw }}</a>' +
-        '<div class="ballon_area ballon_our">{{ properties.reviews.area|raw }}</div>' +
-        '<div class="ballon_time ballon_our">{{ properties.reviews.date|raw }}</div>', {
+        '<div class="baloon-container">' +
+            '<div class="baloon-container__top">' +
+                '<div class="ballon_place ballon_our"><strong>{{ properties.reviews.place|raw }}</strong></div>' +
+                '<a href="#" id="links" class="ballon_adres ballon_our">{{ properties.adressReview|raw }}</a>' +
+                '<div class="ballon_area ballon_our">{{ properties.reviews.area|raw }}</div>' +
+            '</div>'+
+            '<span class="ballon_time ballon_our">{{ properties.date|raw }}</span>' +
+        '</div>', {
             build: function () {
                 customItemContentLayout.superclass.build.call(this);
                 document.querySelector('#links').addEventListener('click', this.onCounterClick);
@@ -44,6 +49,8 @@ function init(){
     
     myMap.events.add('click', function (e) {
         if (create.innerHTML != '') {
+            create.innerHTML = '';
+            getModal (e);
         } else {
             getModal (e);
         }
@@ -70,8 +77,13 @@ function init(){
                 reviewModal(adres, coords);            
             })
     }
-    function createPlacemark(coords, adress, arrRev) {
-        let comentDate = formatDateBaloon(new Date);
+    function createPlacemark(coords, adress, arrRev, arcivedDate) {
+        let comentDate;
+        if (arcivedDate == undefined) {
+            comentDate = formatDateBaloon(new Date);
+        } else {
+            comentDate = arcivedDate;
+        };        
         let mark = new ymaps.Placemark(coords,{
             adressReview: adress,
             reviews: arrRev,
@@ -109,6 +121,9 @@ function init(){
                 area: document.querySelector('.i-area').value,
                 dateModal: nowDate
             });
+            document.querySelector('.i-name').value = '';
+            document.querySelector('.i-place').value = '';
+            document.querySelector('.i-area').value = '';
             eachLi(thisAdress);
         } 
     })
@@ -144,10 +159,15 @@ function init(){
       
         let yy = date.getFullYear();
         let se = date.getSeconds();
+        if (se < 10) se = '0' + se;
+
         let mi = date.getMinutes();
+        if (mi < 10) mi = '0' + mi;
+
         let hr = date.getHours();
+        if (hr < 10) hr = '0' + hr;
         
-        return yy + '.' + mm + '.' + dd + ' ' + hr +':'+ mi +':'+ se;
+        return yy + '.' + mm + '.' + dd + '  ' + hr +':'+ mi +':'+ se;
     }
     function formatDateModal(date) {
 
@@ -175,7 +195,7 @@ function init(){
     myMap.geoObjects.add(clusterer);
     if (data) {
         data.forEach(thismark => {
-            createPlacemark (thismark.coord, thismark.adres, thismark.review);
+            createPlacemark (thismark.coord, thismark.adres, thismark.review, thismark.date);
         })
     }
 }

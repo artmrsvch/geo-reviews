@@ -198,6 +198,20 @@
 .reviews-item__date {
     color:#adadad;
 }
-.reviews-item__area {
+.baloon-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+.baloon-container__top {
+    display: flex;
+    flex-direction: column;
 
+}
+.ballon_time {
+    text-align: end;
+}
+.ymaps-2-1-75-b-cluster-carousel__content-item_current_yes {
+    height: 100%;
 }

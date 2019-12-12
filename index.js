@@ -29,13 +29,11 @@ function init(){
                 myMap.balloon.close();
             }
         }
-    );
-    
+    ); 
     const myMap = new ymaps.Map('maps', {
         center: [55.7482921,37.5900027],
         zoom: 15 
     })
-
     myMap.events.add('click', function (e) {
         if (create.innerHTML != '') {
 
@@ -46,6 +44,7 @@ function init(){
     function findName (place) {
         let keeper = clusterer.getGeoObjects();
         let t;
+
         keeper.forEach(obj => {
             if (place == obj.properties._data.reviews.place) {
                 t = obj.geometry._coordinates;
@@ -65,40 +64,36 @@ function init(){
             })
     }
     function createPlacemark(coords, adress, arrRev) {
-            return new ymaps.Placemark(coords,{
-                adressReview: adress,
-                reviews: arrRev,
-            },{
-                preset: 'islands#violetIcon',
-            });
-}   
+        return new ymaps.Placemark(coords,{
+            adressReview: adress,
+            reviews: arrRev,
+        },{
+            preset: 'islands#violetIcon',
+        });
+    }   
     function reviewModal(adress, coords) {
         const template = Handlebars.compile(modal.innerHTML);
         const psd = template({position: adress});
         create.innerHTML = psd;
         thisAdress = adress;
         thisCoords = coords;
-    }
-    
+    }  
     create.addEventListener('click', (e)=>{
         if(e.target.className == 'close-reviews') {
             create.innerHTML = '';
             myPlacemark = undefined;
-        } else if (e.target.className == 'i-btn') { 
-                
-                myPlacemark = createPlacemark(thisCoords, thisAdress, {
-                    name: document.querySelector('.i-name').value,
-                    place: document.querySelector('.i-place').value,
-                    area: document.querySelector('.i-area').value
-                });
-                placeObject.push(myPlacemark);
-                myMap.geoObjects.add(myPlacemark);
-                clusterer.add(myPlacemark);
-
-                eachLi(thisAdress);
+        } else if (e.target.className == 'i-btn') {          
+            myPlacemark = createPlacemark(thisCoords, thisAdress, {
+                name: document.querySelector('.i-name').value,
+                place: document.querySelector('.i-place').value,
+                area: document.querySelector('.i-area').value
+            });
+            placeObject.push(myPlacemark);
+            myMap.geoObjects.add(myPlacemark);
+            clusterer.add(myPlacemark);
+            eachLi(thisAdress);
         } 
     })
-
     function eachLi (adress) {
         let keeper = clusterer.getGeoObjects();
         let arrTemp = new Array;
@@ -133,6 +128,5 @@ function init(){
         clusterBalloonContentLayoutHeight: 130,
         clusterBalloonPagerSize: 5
     });
-    
     myMap.geoObjects.add(clusterer);   
 }

@@ -4,12 +4,32 @@ function init(){
     
     const modal = document.querySelector('#overlay');
     const otziv = document.querySelector('#otziv');
-    let geoObj = new Array; 
     const create = document.querySelector('.create');
     let myPlacemark;
     let thisAdress;
     let thisCoords;
-    
+    let placeObject = new Array;
+    const customItemContentLayout = ymaps.templateLayoutFactory.createClass(
+        '<div class="ballon_place ballon_our"><strong>{{ properties.reviews.place|raw }}</strong></div>' +
+        '<a href="#" id="links" class="ballon_adres ballon_our">{{ properties.adressReview|raw }}</a>' +
+        '<div class="ballon_area ballon_our">{{ properties.reviews.area|raw }}</div>', {
+            build: function () {
+                customItemContentLayout.superclass.build.call(this);
+                document.querySelector('#links').addEventListener('click', this.onCounterClick);
+            },
+            clear: function () {
+                document.querySelector('#links').removeEventListener('click', this.onCounterClick);
+                customItemContentLayout.superclass.clear.call(this);
+            },
+            onCounterClick: function (e) {
+                e.preventDefault();
+                let p = findName(e.target.previousElementSibling.textContent);
+                reviewModal(e.target.textContent, p);
+                eachLi(e.target.textContent);
+                myMap.balloon.close();
+            }
+        }
+    );
     
     const myMap = new ymaps.Map('maps', {
         center: [55.7482921,37.5900027],
@@ -23,6 +43,16 @@ function init(){
             getModal (e);
         }
     });
+    function findName (place) {
+        let keeper = clusterer.getGeoObjects();
+        let t;
+        keeper.forEach(obj => {
+            if (place == obj.properties._data.reviews.place) {
+                t = obj.geometry._coordinates;
+            }
+        }) 
+        return t;
+    }
     function getModal (e) {
         let coords = e.get('coords'); 
             ymaps.geocode(coords)
@@ -34,83 +64,75 @@ function init(){
                 reviewModal(adres, coords);            
             })
     }
-    // Создание метки.
-    function createPlacemark(coords, adress, arrRev, placemark) {
-        if (placemark == undefined) {   //передаем метку
-            let temp = [];
-            
-            temp.push(arrRev);
+    function createPlacemark(coords, adress, arrRev) {
             return new ymaps.Placemark(coords,{
                 adressReview: adress,
-                reviews: temp,
-        },{
-            preset: 'islands#violetIcon',
-        });
-        } else {
-            placemark.properties._data.reviews.push(arrRev)
-        }
-    }
-    
-    // Определяем адрес по координатам (обратное геокодирование).
+                reviews: arrRev,
+            },{
+                preset: 'islands#violetIcon',
+            });
+}   
     function reviewModal(adress, coords) {
         const template = Handlebars.compile(modal.innerHTML);
         const psd = template({position: adress});
-        create.innerHTML = psd;   //открываем модалку с отзывами
+        create.innerHTML = psd;
         thisAdress = adress;
         thisCoords = coords;
     }
     
-    create.addEventListener('click', (e)=>{        //вешаем обработчик событий на модалку
-        if(e.target.className == 'close-reviews') {   //если клик по кнопке закрыть - закрываем модалку
+    create.addEventListener('click', (e)=>{
+        if(e.target.className == 'close-reviews') {
             create.innerHTML = '';
-            myPlacemark = undefined;              
-        } else if (e.target.className == 'i-btn') {   //если клик по кнопке добавить  
-
-            if (myPlacemark == undefined) {
+            myPlacemark = undefined;
+        } else if (e.target.className == 'i-btn') { 
+                
                 myPlacemark = createPlacemark(thisCoords, thisAdress, {
                     name: document.querySelector('.i-name').value,
                     place: document.querySelector('.i-place').value,
                     area: document.querySelector('.i-area').value
-                }); //создаем маркер с текущими отзывами и адресом
-                myMap.geoObjects.add(myPlacemark);                     //добавлем маркер на карту
-            } else {
-                console.log('ДАДАВАЙ НАХУЙ УЖЕ НАКОНЕЦ');
-                createPlacemark(thisCoords, thisAdress, {
-                    name: document.querySelector('.i-name').value,
-                    place: document.querySelector('.i-place').value,
-                    area: document.querySelector('.i-area').value
-                }, myPlacemark);
-            }
-            eachLi(myPlacemark);
-        }
+                });
+                placeObject.push(myPlacemark);
+                myMap.geoObjects.add(myPlacemark);
+                clusterer.add(myPlacemark);
+
+                eachLi(thisAdress);
+        } 
     })
-    function eachLi (myPlacemark) {
-        const acessObj = myPlacemark.properties._data;         
+
+    function eachLi (adress) {
+        let keeper = clusterer.getGeoObjects();
+        let arrTemp = new Array;
+        keeper.forEach(obj => {
+            if (adress == obj.properties._data.adressReview) {
+                arrTemp.push(obj.properties._data.reviews);
+            }
+        })        
         const templateOtz = Handlebars.compile(otziv.innerHTML);
-        const psdOtz = templateOtz(acessObj.reviews);
-        document.querySelector('.reviews').innerHTML = psdOtz; 
+        const psdOtz = templateOtz(arrTemp);
+        document.querySelector('.reviews').innerHTML = psdOtz;
     }
     myMap.geoObjects.events.add('click', function (e) {
-        myPlacemark = e.get('target');
-        console.log(e.get('target').properties._data.reviews);
-        reviewModal(e.get('target').properties._data.adressReview, e.get('coords'));
-        eachLi(e.get('target'));
+        const targ = e.get('target');
+        if (targ.properties._data.geoObjects) {
+            
+        } else {
+            myPlacemark = targ;
+            reviewModal(targ.properties._data.adressReview, e.get('coords'));
+            eachLi(targ.properties._data.adressReview);
+        }
     })
-    let clusterer = new ymaps.Clusterer({
-
-    });
-    /*clusterer.createCluster = function(center, geoObjects)
-        {
-            var cluster = ymaps.Clusterer.prototype.createCluster.call(this, center, geoObjects) ;
-            cluster.events.add('click', function(e) {
-                e.stopImmediatePropagation();
-                console.log('Кликнут кластер') ;    
-                
-            }) ;
-            return cluster;
-        };*/
-    myMap.geoObjects.add(clusterer);
     
-
-   
+    let clusterer = new ymaps.Clusterer({
+        clusterDisableClickZoom: true,
+        clusterOpenBalloonOnClick: true,
+        preset: 'islands#invertedVioletClusterIcons',
+        clusterBalloonContentLayout: 'cluster#balloonCarousel',
+        clusterBalloonItemContentLayout: customItemContentLayout,
+        clusterBalloonPanelMaxMapArea: 0,
+        clusterBalloonContentLayoutWidth: 200,
+        clusterBalloonContentLayoutHeight: 130,
+        clusterBalloonPagerSize: 5
+    });
+    
+    myMap.geoObjects.add(clusterer);   
 }

@@ -137,3 +137,16 @@
     outline: none;
     cursor: pointer;
 }
+.ballon_our {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+.ballon_place {
+
+}
+.ballon_adres {
+    
+}
+.ballon_area {
+    margin-top: 5px;
+}

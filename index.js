@@ -109,6 +109,41 @@ function init(){
         create.innerHTML = psd;
         thisAdress = adress;
         thisCoords = coords;
+        const df = document.querySelector('.review-container__header');
+        df.addEventListener('mousedown', function moces(event) {
+                event.preventDefault();    
+                let dragElem = create;
+                dragElem.style.position = 'absolute';
+                let coords = getCoords(dragElem);
+                let shiftX = event.pageX - coords.left;
+                let shiftY = event.pageY - coords.top;
+                
+                moveAt(event.pageX, event.pageY);
+                function moveAt(pageX, pageY) {
+                    dragElem.style.left = pageX - shiftX + 'px';
+                    dragElem.style.top = pageY -  shiftY + 'px';
+                }
+                function onMouseMove(event) {
+                    moveAt(event.pageX, event.pageY);
+                } 
+                document.addEventListener('mousemove', onMouseMove);
+                dragElem.onmouseup = ()=> {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    dragElem.onmousemove = null;
+                    dragElem.onmouseup = null;
+                };
+                document.oncontextmenu = cmenu; 
+                function cmenu() {
+                    return; 
+                } 
+                function getCoords(elem) {  
+                    var box = elem.getBoundingClientRect();
+                    return {
+                    top: box.top + pageYOffset,
+                    left: box.left + pageXOffset
+                    };
+                }
+        })
     }  
     create.addEventListener('click', (e)=>{
         if(e.target.className == 'close-reviews') {

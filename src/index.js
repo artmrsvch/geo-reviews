@@ -1,8 +1,7 @@
-import render from './template/modal.hbs';
 import './css/style.css';
+import render from './template/modal.hbs';
 import renderRevi from './template/reviews.hbs';
 import { formatDateBaloon, formatDateModal } from './js/getDates';
-import { getModal } from './js/modal';
 
 ymaps.ready(init);
 
@@ -58,6 +57,17 @@ function init(){
             getModal (e);
         }
     });
+    function getModal (e) {
+        let coords = e.get('coords'); 
+            ymaps.geocode(coords)
+            .then(function (res) {
+                let firstGeoObject = res.geoObjects.get(0);    
+                return firstGeoObject.getAddressLine();;
+            })
+            .then((adres)=>{
+                reviewModal(adres, coords);            
+            })
+    }
     function findName (place) {
         let keeper = clusterer.getGeoObjects();
         let t;

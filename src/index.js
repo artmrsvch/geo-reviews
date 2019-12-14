@@ -1,3 +1,4 @@
+import './css/style.css';
 ymaps.ready(init);
 
 function init(){

@@ -5,22 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://fonts.googleapis.com/css?family=Fira+Sans&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <script src="https://api-maps.yandex.ru/2.1/?apikey=c89c1fe4-e63f-48e8-9a11-c7a9a99608f5&lang=ru_RU" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
-    <title>Reviews Map</title>
+    <link rel="stylesheet" href="style.css">
+    <title>GeoReviews</title>
 </head>
 <body>
-    <style>
-        .container {
-            width: 100vw;
-            height: 100vh;
-        }
-        .maps {
-            height: 100%;
-            width: 100%;
-        }
-    </style>
     <div class="container">
         <div class="maps" id="maps"></div>
     </div>
@@ -54,14 +44,13 @@
     </script>
     <script type="text/x-handlebars-template" id="otziv">
         {{#each this}}
-        <li class="reviews-item">
-            <span class="reviews-item__name"><strong>{{ name }}</strong></span>
-            <span class="reviews-item__place">{{ place }}</span>
-            <span class="reviews-item__date">{{ dateModal }}</span><br>
-            <span class="reviews-item__area">{{ area }}</span>
-        </li>
+            <li class="reviews-item">
+                <span class="reviews-item__name"><strong>{{ name }}</strong></span>
+                <span class="reviews-item__place">{{ place }}</span>
+                <span class="reviews-item__date">{{ dateModal }}</span><br>
+                <span class="reviews-item__area">{{ area }}</span>
+            </li>
         {{/each}}
     </script>
-    <script src="index.js"></script>
 </body>
 </html>

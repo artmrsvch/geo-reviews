@@ -1,3 +1,11 @@
+.container {
+    width: 100vw;
+    height: 100vh;
+}
+.maps {
+    height: 100%;
+    width: 100%;
+}
 .create {
     position: fixed;
     left: 40%;
@@ -179,12 +187,6 @@
 .ballon_our {
     font-size: 12px;
     margin-bottom: 5px;
-}
-.ballon_place {
-
-}
-.ballon_adres {
-
 }
 .ballon_area {
     margin-top: 5px;

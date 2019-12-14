@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans&display=swap" rel="stylesheet">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=c89c1fe4-e63f-48e8-9a11-c7a9a99608f5&lang=ru_RU" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>GeoReviews</title>
+<link href="style.css" rel="stylesheet"></head>
+<body>
+    <div class="container">
+        <div class="maps" id="maps"></div>
+    </div>
+    <div class="create"></div>
+    <script type="text/x-handlebars-template" id="overlay">
+        <div class="review-container">
+            <div class="review-container__header">
+                <div class="review-container__header-left-block">
+                    <svg class="svg-geo">
+                        <use xlink:href="./img/geo.svg#geo"></use>
+                    </svg>
+                    <span class="review-container__adress">{{ position }}</span>
+                </div>
+                <button type="button" class="close-reviews"></button>
+            </div>
+            <ul class="reviews">
+                <li class="reviews-item">
+                    Отзывов пока нет
+                </li>
+            </ul>
+            <form action="" id="forms">
+                <h3 class="headline">ваш отзыв</h3>
+                <input type="text" placeholder="Ваше имя" name="autor-name" class="i-name style-input">
+                <input type="text" placeholder="Укажите место" name="place" class="i-place style-input">
+                <textarea name="write-reviews" placeholder="Поделитесь впечатлениями" class="i-area"></textarea>
+                <div class="btn-container">
+                    <button type="button" class="i-btn">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </script>
+    <script type="text/x-handlebars-template" id="otziv">
+        {{#each this}}
+            <li class="reviews-item">
+                <span class="reviews-item__name"><strong>{{ name }}</strong></span>
+                <span class="reviews-item__place">{{ place }}</span>
+                <span class="reviews-item__date">{{ dateModal }}</span><br>
+                <span class="reviews-item__area">{{ area }}</span>
+            </li>
+        {{/each}}
+    </script>
+<script type="text/javascript" src="index.fa9d37ea6bf248e76cc4.js"></script></body>
+</html>

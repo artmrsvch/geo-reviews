@@ -1,17 +1,19 @@
+import render from './template/modal.hbs';
 import './css/style.css';
+import renderRevi from './template/reviews.hbs';
+import { formatDateBaloon, formatDateModal } from './js/getDates';
+import { getModal } from './js/modal';
+
 ymaps.ready(init);
 
 function init(){
-    
-    const modal = document.querySelector('#overlay');
-    const otziv = document.querySelector('#otziv');
     const create = document.querySelector('.create');
-    
     let storage = localStorage;
     let data;
     let thisAdress;
     let thisCoords;
     let placeObject = new Array;
+    
     const customItemContentLayout = ymaps.templateLayoutFactory.createClass(
         '<div class="baloon-container">' +
             '<div class="baloon-container__top">' +
@@ -67,17 +69,7 @@ function init(){
         }) 
         return t;
     }
-    function getModal (e) {
-        let coords = e.get('coords'); 
-            ymaps.geocode(coords)
-            .then(function (res) {
-                let firstGeoObject = res.geoObjects.get(0);    
-                return firstGeoObject.getAddressLine();;
-            })
-            .then((adres)=>{
-                reviewModal(adres, coords);            
-            })
-    }
+    
     function createPlacemark(coords, adress, arrRev, arcivedDate) {
         let comentDate;
         if (arcivedDate == undefined) {
@@ -103,66 +95,66 @@ function init(){
         clusterer.add(mark);
 
         return mark
-    }   
+    }
     function reviewModal(adress, coords) {
-        const template = Handlebars.compile(modal.innerHTML);
-        const psd = template({position: adress});
-        create.innerHTML = psd;
+        create.innerHTML = render({position: adress});
         thisAdress = adress;
         thisCoords = coords;
         const df = document.querySelector('.review-container__header');
         df.addEventListener('mousedown', function moces(event) {
-                event.preventDefault();    
-                let dragElem = create;
-                dragElem.style.position = 'absolute';
-                let coords = getCoords(dragElem);
-                let shiftX = event.pageX - coords.left;
-                let shiftY = event.pageY - coords.top;
-                
+            event.preventDefault();    
+            let dragElem = create;
+            dragElem.style.position = 'absolute';
+            let coords = getCoords(dragElem);
+            let shiftX = event.pageX - coords.left;
+            let shiftY = event.pageY - coords.top;
+                    
+            moveAt(event.pageX, event.pageY);
+            function moveAt(pageX, pageY) {
+                dragElem.style.left = pageX - shiftX + 'px';
+                dragElem.style.top = pageY -  shiftY + 'px';
+            }
+            function onMouseMove(event) {
                 moveAt(event.pageX, event.pageY);
-                function moveAt(pageX, pageY) {
-                    dragElem.style.left = pageX - shiftX + 'px';
-                    dragElem.style.top = pageY -  shiftY + 'px';
-                }
-                function onMouseMove(event) {
-                    moveAt(event.pageX, event.pageY);
-                } 
-                document.addEventListener('mousemove', onMouseMove);
-                dragElem.onmouseup = ()=> {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    dragElem.onmousemove = null;
-                    dragElem.onmouseup = null;
+            } 
+            document.addEventListener('mousemove', onMouseMove);
+            dragElem.onmouseup = ()=> {
+                document.removeEventListener('mousemove', onMouseMove);
+                dragElem.onmousemove = null;
+                dragElem.onmouseup = null;
+            };
+            document.oncontextmenu = cmenu; 
+            function cmenu() {
+                return; 
+            
+            } 
+            function getCoords(elem) {  
+                let box = elem.getBoundingClientRect();
+                return {
+                top: box.top + pageYOffset,
+                left: box.left + pageXOffset
                 };
-                document.oncontextmenu = cmenu; 
-                function cmenu() {
-                    return; 
-                } 
-                function getCoords(elem) {  
-                    var box = elem.getBoundingClientRect();
-                    return {
-                    top: box.top + pageYOffset,
-                    left: box.left + pageXOffset
-                    };
-                }
+            }
+        });   
+    
+        create.addEventListener('click', (e)=>{    
+            if(e.target.className == 'close-reviews') {
+                create.innerHTML = '';
+            } else if (e.target.className == 'i-btn') {      
+                    let nowDate = formatDateModal(new Date);
+                    createPlacemark(thisCoords, thisAdress, {
+                    name: document.querySelector('.i-name').value,
+                    place: document.querySelector('.i-place').value,
+                    area: document.querySelector('.i-area').value,
+                    dateModal: nowDate
+                });
+                document.querySelector('.i-name').value = '';
+                document.querySelector('.i-place').value = '';
+                document.querySelector('.i-area').value = '';
+                eachLi(thisAdress);
+            } 
         })
-    }  
-    create.addEventListener('click', (e)=>{
-        if(e.target.className == 'close-reviews') {
-            create.innerHTML = '';
-        } else if (e.target.className == 'i-btn') {      
-                let nowDate = formatDateModal(new Date);
-                createPlacemark(thisCoords, thisAdress, {
-                name: document.querySelector('.i-name').value,
-                place: document.querySelector('.i-place').value,
-                area: document.querySelector('.i-area').value,
-                dateModal: nowDate
-            });
-            document.querySelector('.i-name').value = '';
-            document.querySelector('.i-place').value = '';
-            document.querySelector('.i-area').value = '';
-            eachLi(thisAdress);
-        } 
-    })
+    }
     function eachLi (adress) {
         let keeper = clusterer.getGeoObjects();
         let arrTemp = new Array;
@@ -171,13 +163,10 @@ function init(){
                 arrTemp.push(obj.properties._data.reviews);
             }
         })        
-        const templateOtz = Handlebars.compile(otziv.innerHTML);
-        const psdOtz = templateOtz(arrTemp);
-        document.querySelector('.reviews').innerHTML = psdOtz;
+        document.querySelector('.reviews').innerHTML = renderRevi(arrTemp);
     }
     myMap.geoObjects.events.add('click', function (e) {
         const targ = e.get('target');
-        console.log(targ);
         if (targ.properties._data.geoObjects) {
             
         } else {
@@ -185,38 +174,7 @@ function init(){
             eachLi(targ.properties._data.adressReview);
         }
     })
-    function formatDateBaloon(date) {
-
-        let dd = date.getDate();
-        if (dd < 10) dd = '0' + dd;
-      
-        let mm = date.getMonth() + 1;
-        if (mm < 10) mm = '0' + mm;
-      
-        let yy = date.getFullYear();
-        let se = date.getSeconds();
-        if (se < 10) se = '0' + se;
-
-        let mi = date.getMinutes();
-        if (mi < 10) mi = '0' + mi;
-
-        let hr = date.getHours();
-        if (hr < 10) hr = '0' + hr;
-        
-        return yy + '.' + mm + '.' + dd + '  ' + hr +':'+ mi +':'+ se;
-    }
-    function formatDateModal(date) {
-
-        let dd = date.getDate();
-        if (dd < 10) dd = '0' + dd;
-      
-        let mm = date.getMonth() + 1;
-        if (mm < 10) mm = '0' + mm;
-      
-        let yy = date.getFullYear();
-
-        return dd + '.' + mm + '.' + yy;
-    }
+    
     let clusterer = new ymaps.Clusterer({
         clusterDisableClickZoom: true,
         clusterOpenBalloonOnClick: true,

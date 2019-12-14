@@ -1,0 +1,25 @@
+<div class="review-container">
+    <div class="review-container__header">
+        <div class="review-container__header-left-block">
+            <svg class="svg-geo">
+                <use xlink:href="./src/img/geo.svg#geo"></use>
+            </svg>
+            <span class="review-container__adress">{{ position }}</span>
+        </div>
+        <button type="button" class="close-reviews"></button>
+    </div>
+    <ul class="reviews">
+        <li class="reviews-item">
+            Отзывов пока нет
+        </li>
+    </ul>
+    <form action="" id="forms">
+        <h3 class="headline">ваш отзыв</h3>
+        <input type="text" placeholder="Ваше имя" name="autor-name" class="i-name style-input">
+        <input type="text" placeholder="Укажите место" name="place" class="i-place style-input">
+        <textarea name="write-reviews" placeholder="Поделитесь впечатлениями" class="i-area"></textarea>
+        <div class="btn-container">
+            <button type="button" class="i-btn">Добавить</button>
+        </div>
+    </form>
+</div>

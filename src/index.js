@@ -146,7 +146,7 @@ function init(){
                 };
             }
         });   
-    
+    }
         create.addEventListener('click', (e)=>{    
             if(e.target.className == 'close-reviews') {
                 create.innerHTML = '';
@@ -164,7 +164,7 @@ function init(){
                 eachLi(thisAdress);
             } 
         })
-    }
+    
     function eachLi (adress) {
         let keeper = clusterer.getGeoObjects();
         let arrTemp = new Array;

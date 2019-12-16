@@ -1,2 +1,1 @@
-// "handlebars": "^4.1.2",
-    //"handlebars-loader": "^1.7.1",
+Geo-map with the ability to leave reviews that are saved when the page is reloaded.
